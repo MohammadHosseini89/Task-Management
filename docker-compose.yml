@@ -1,0 +1,67 @@
+version: '3'
+
+services:
+  laravel.taskmanagement:
+        privileged: true
+        build:
+            context: ./vendor/laravel/sail/runtimes/8.1
+            dockerfile: Dockerfile
+            args:
+                WWWGROUP: 1000
+        image: ramesh-taskmanagement/app
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
+        ports:
+             - '9935:80'
+        environment:
+            WWWUSER: 'MohammadHosseini'
+            LARAVEL_SAIL: 1
+        volumes:
+            - '.:/var/www/html'
+        networks:
+            - sailtaskmanagement
+        depends_on:
+            - mysqltaskmanagement
+            # - redis
+  mysqltaskmanagement:
+            image: 'mysql:8.0'
+            ports:
+             - "9907:9907"
+            environment:
+                MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+                MYSQL_DATABASE: '${DB_DATABASE}'
+                MYSQL_USER: '${DB_USERNAME}'
+                MYSQL_PASSWORD: '${DB_PASSWORD}'
+                MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+                MYSQL_TCP_PORT: '9907'
+
+            command: --secure-file-priv=""
+            volumes:
+                - 'sail-mysql:/var/lib/mysql'
+                - ./storage:/var/www/html/storage
+            networks:
+                - sailtaskmanagement
+
+  phpmyadmintaskmanagement:
+            image: phpmyadmin
+            restart: always
+            ports:
+                - '9911:80'
+            environment:
+                PMA_HOST: mysqltaskmanagement
+                MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+                PMA_PORT: '9907'
+
+            networks:
+                - sailtaskmanagement
+            depends_on:
+                - mysqltaskmanagement
+
+                
+networks:
+  sailtaskmanagement:
+     driver: bridge
+     
+volumes:
+  sail-mysql:
+     driver: local

@@ -1,0 +1,34 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('export_log_models', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('task_management_model_id');
+            $table->unsignedBigInteger('user_id');
+            $table->string('user_name')->nullable();
+            $table->string('email')->nullable();
+            $table->string('export_type')->nullable();
+            $table->string('session_id')->nullable();
+            $table->string('file_name_export')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('export_log_models');
+    }
+};
